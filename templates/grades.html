@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if children_data %}
-    {% for data in children_data %}
+{% if children %}
     <div class="child-card">
-        <div class="child-name">{{ data.child.name }}</div>
+        <select class="child-select" onchange="window.location.href='{{ url_for('view_grades') }}?child_id=' + this.value;">
+            {% for child in children %}
+            <option value="{{ child.id }}" {% if child.id == selected_child.id %}selected{% endif %}>{{ child.name }}</option>
+            {% endfor %}
+        </select>
+        {% if data %}
         <div class="course-name">{{ data.gradebook.name }}</div>
 
         {% if data.homework or data.tests %}
@@ -81,8 +85,10 @@
         {% if not data.homework and not data.tests %}
         <p class="no-grades">No grades entered yet.</p>
         {% endif %}
+        {% else %}
+        <p class="no-grades">No course set up for this child.</p>
+        {% endif %}
     </div>
-    {% endfor %}
 {% else %}
     <div class="empty-state">
         <p>No children added yet.</p>
