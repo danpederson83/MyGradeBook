@@ -59,6 +59,7 @@
                 <thead>
                     <tr>
                         <th>Lesson</th>
+                        <th>Redo</th>
                         <th>Score</th>
                         <th>%</th>
                     </tr>
@@ -66,7 +67,8 @@
                 <tbody>
                     {% for grade in data.homework %}
                     <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
-                        <td>{{ grade.label }}{% if grade.redo_number > 0 %} <span class="redo-badge">redo #{{ grade.redo_number }}</span>{% endif %}</td>
+                        <td>{{ grade.label }}</td>
+                        <td>{{ grade.redo_number }}</td>
                         <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
                         <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
                     </tr>
@@ -83,6 +85,7 @@
                 <thead>
                     <tr>
                         <th>Test</th>
+                        <th>Redo</th>
                         <th>Score</th>
                         <th>%</th>
                     </tr>
@@ -90,7 +93,8 @@
                 <tbody>
                     {% for grade in data.tests %}
                     <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
-                        <td>{{ grade.label }}{% if grade.redo_number > 0 %} <span class="redo-badge">redo #{{ grade.redo_number }}</span>{% endif %}</td>
+                        <td>{{ grade.label }}</td>
+                        <td>{{ grade.redo_number }}</td>
                         <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
                         <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
                     </tr>
