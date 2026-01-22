@@ -59,18 +59,18 @@
                 <thead>
                     <tr>
                         <th>Lesson</th>
-                        <th>Redo</th>
                         <th>Score</th>
                         <th>%</th>
+                        <th>Redo</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for grade in data.homework %}
                     <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
                         <td>{{ grade.label }}</td>
-                        <td>{{ grade.redo_number }}</td>
                         <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
                         <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
+                        <td>{{ grade.redo_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,18 +85,18 @@
                 <thead>
                     <tr>
                         <th>Test</th>
-                        <th>Redo</th>
                         <th>Score</th>
                         <th>%</th>
+                        <th>Redo</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for grade in data.tests %}
                     <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
                         <td>{{ grade.label }}</td>
-                        <td>{{ grade.redo_number }}</td>
                         <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
                         <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
+                        <td>{{ grade.redo_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
