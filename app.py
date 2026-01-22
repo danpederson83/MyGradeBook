@@ -444,6 +444,15 @@ def delete_course(gradebook_id):
     return redirect(url_for('settings'))
 
 
+@app.route('/delete_grade/<int:grade_id>', methods=['POST'])
+def delete_grade(grade_id):
+    grade = Grade.query.get_or_404(grade_id)
+    child_id = grade.gradebook.child_id
+    db.session.delete(grade)
+    db.session.commit()
+    return redirect(url_for('view_grades', child_id=child_id))
+
+
 @app.route('/export_csv')
 def export_csv():
     output = io.StringIO()
