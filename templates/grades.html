@@ -7,6 +7,29 @@
         <div class="child-name">{{ data.child.name }}</div>
         <div class="course-name">{{ data.gradebook.name }}</div>
 
+        {% if data.homework or data.tests %}
+        <div class="stats-section">
+            {% if data.homework_avg is not none %}
+            <div class="stat-item">
+                <span class="stat-label">Avg Lesson Score</span>
+                <span class="stat-value">{{ data.homework_avg|round(1) }}%</span>
+            </div>
+            {% endif %}
+            {% if data.test_avg is not none %}
+            <div class="stat-item">
+                <span class="stat-label">Avg Test Score</span>
+                <span class="stat-value">{{ data.test_avg|round(1) }}%</span>
+            </div>
+            {% endif %}
+            {% if data.total_avg is not none %}
+            <div class="stat-item stat-total">
+                <span class="stat-label">Total Score</span>
+                <span class="stat-value">{{ data.total_avg|round(1) }}%</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         {% if data.homework %}
         <div class="grade-section">
             <h3>Homework</h3>

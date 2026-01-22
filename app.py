@@ -258,11 +258,32 @@ def view_grades():
                 gradebook_id=gradebook.id, grade_type='test'
             ).order_by(Grade.label, Grade.redo_number).all()
 
+            # Calculate averages (as percentages)
+            homework_avg = None
+            if homework:
+                homework_avg = sum((g.score / g.total) * 100 for g in homework) / len(homework)
+
+            test_avg = None
+            if tests:
+                test_avg = sum((g.score / g.total) * 100 for g in tests) / len(tests)
+
+            # Total score is average of the two averages (not all grades combined)
+            total_avg = None
+            if homework_avg is not None and test_avg is not None:
+                total_avg = (homework_avg + test_avg) / 2
+            elif homework_avg is not None:
+                total_avg = homework_avg
+            elif test_avg is not None:
+                total_avg = test_avg
+
             children_data.append({
                 'child': child,
                 'gradebook': gradebook,
                 'homework': homework,
-                'tests': tests
+                'tests': tests,
+                'homework_avg': homework_avg,
+                'test_avg': test_avg,
+                'total_avg': total_avg
             })
     return render_template('grades.html', children_data=children_data)
 
