@@ -32,6 +32,24 @@
             </div>
             {% endif %}
         </div>
+
+        {% if data.homework %}
+        <div class="chart-section">
+            <h3>Lesson Scores</h3>
+            <div class="chart-container">
+                <canvas id="homeworkChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.tests %}
+        <div class="chart-section">
+            <h3>Test Scores</h3>
+            <div class="chart-container">
+                <canvas id="testChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
         {% endif %}
 
         {% if data.homework %}
@@ -89,6 +107,76 @@
         <p class="no-grades">No course set up for this child.</p>
         {% endif %}
     </div>
+
+    {% if data and (data.homework or data.tests) %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        };
+
+        {% if data.homework %}
+        new Chart(document.getElementById('homeworkChart'), {
+            type: 'line',
+            data: {
+                labels: [{% for g in data.homework %}'{{ g.label }}{% if g.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    data: [{% for g in data.homework %}{{ ((g.score / g.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    borderColor: '#0066cc',
+                    backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#0066cc'
+                }]
+            },
+            options: chartOptions
+        });
+        {% endif %}
+
+        {% if data.tests %}
+        new Chart(document.getElementById('testChart'), {
+            type: 'line',
+            data: {
+                labels: [{% for g in data.tests %}'{{ g.label }}{% if g.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    data: [{% for g in data.tests %}{{ ((g.score / g.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#28a745'
+                }]
+            },
+            options: chartOptions
+        });
+        {% endif %}
+    </script>
+    {% endif %}
 {% else %}
     <div class="empty-state">
         <p>No children added yet.</p>
