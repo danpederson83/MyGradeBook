@@ -154,7 +154,7 @@
                     fill: true,
                     tension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: '#0066cc'
+                    pointBackgroundColor: [{% for g in data.homework %}'{% if g.redo_number > 0 %}#ff9500{% else %}#0066cc{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
@@ -173,7 +173,7 @@
                     fill: true,
                     tension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: '#28a745'
+                    pointBackgroundColor: [{% for g in data.tests %}'{% if g.redo_number > 0 %}#ff9500{% else %}#28a745{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
