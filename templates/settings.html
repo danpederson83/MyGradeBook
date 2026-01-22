@@ -9,24 +9,68 @@
     {% endif %}
 {% endwith %}
 
-<h2>Default Scores</h2>
+<h2>Course Settings</h2>
 
 {% if children_data %}
     {% for data in children_data %}
     <div class="child-card">
-        <div class="child-name">{{ data.child.name }} - Math</div>
+        <div class="child-name">{{ data.child.name }}</div>
 
-        <form action="{{ url_for('update_totals', gradebook_id=data.gradebook.id) }}" method="post">
-            <div class="entry-row">
-                <label>Homework total:</label>
-                <input type="number" name="homework_total" value="{{ data.gradebook.homework_total }}" min="1">
+        <div class="course-section">
+            <h3>Active Course</h3>
+            <form action="{{ url_for('set_active_course', gradebook_id=0) }}" method="post" class="course-select-form">
+                <select name="gradebook_id" onchange="this.form.action='{{ url_for('set_active_course', gradebook_id=0) }}'.replace('/0', '/' + this.value); this.form.submit();">
+                    {% for gb in data.gradebooks %}
+                    <option value="{{ gb.id }}" {% if gb.is_active %}selected{% endif %}>{{ gb.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+
+        <div class="totals-section">
+            <h3>Default Totals for {{ data.active_gradebook.name }}</h3>
+            <form action="{{ url_for('update_totals', gradebook_id=data.active_gradebook.id) }}" method="post">
+                <div class="entry-row">
+                    <label>Homework:</label>
+                    <input type="number" name="homework_total" value="{{ data.active_gradebook.homework_total }}" min="1">
+                </div>
+                <div class="entry-row" style="margin-top: 10px;">
+                    <label>Test:</label>
+                    <input type="number" name="test_total" value="{{ data.active_gradebook.test_total }}" min="1">
+                </div>
+                <button type="submit" class="btn btn-secondary" style="margin-top: 10px;">Save Totals</button>
+            </form>
+        </div>
+
+        <div class="manage-courses-section">
+            <h3>Manage Courses</h3>
+
+            <div class="add-course-form">
+                <form action="{{ url_for('add_course', child_id=data.child.id) }}" method="post" class="inline-form">
+                    <input type="text" name="course_name" placeholder="New course name" required>
+                    <button type="submit" class="btn btn-primary">Add Course</button>
+                </form>
             </div>
-            <div class="entry-row" style="margin-top: 10px;">
-                <label>Test total:</label>
-                <input type="number" name="test_total" value="{{ data.gradebook.test_total }}" min="1">
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Save</button>
-        </form>
+
+            <ul class="course-list">
+                {% for gb in data.gradebooks %}
+                <li>
+                    <span class="course-item-name">{{ gb.name }}{% if gb.is_active %} <span class="active-badge">active</span>{% endif %}</span>
+                    <div class="course-actions">
+                        <form action="{{ url_for('rename_course', gradebook_id=gb.id) }}" method="post" class="inline-form rename-form">
+                            <input type="text" name="new_name" placeholder="New name" required>
+                            <button type="submit" class="btn btn-small">Rename</button>
+                        </form>
+                        {% if data.gradebooks|length > 1 %}
+                        <form action="{{ url_for('delete_course', gradebook_id=gb.id) }}" method="post" class="inline-form" onsubmit="return confirm('Delete {{ gb.name }}? All grades for this course will be deleted.');">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
     {% endfor %}
 {% else %}
@@ -48,7 +92,7 @@
 
         <div class="import-section">
             <h3>Import Grades</h3>
-            <p>Upload a CSV file to import grades. New children will be created if needed.</p>
+            <p>Upload a CSV file to import grades. New children and courses will be created if needed.</p>
             <form action="{{ url_for('import_csv') }}" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" accept=".csv" required>
                 <button type="submit" class="btn btn-primary">Import CSV</button>

@@ -47,6 +47,11 @@
             font-size: 1.3em;
             font-weight: bold;
             color: #333;
+            margin-bottom: 4px;
+        }
+        .course-name {
+            font-size: 0.95em;
+            color: #666;
             margin-bottom: 12px;
         }
         .grade-entry {
@@ -121,10 +126,25 @@
         .confirm-actions button {
             width: 100%;
         }
+        .gradebook-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .gradebook-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .gradebook-name {
+            font-size: 1.1em;
+            color: #333;
+            margin: 0 0 15px 0;
+        }
         .grade-section {
             margin-bottom: 20px;
         }
-        .grade-section h3 {
+        .grade-section h3, .grade-section h4 {
             font-size: 1em;
             color: #666;
             margin: 0 0 10px 0;
@@ -191,6 +211,75 @@
             gap: 10px;
         }
         .import-section input[type="file"] {
+            font-size: 14px;
+        }
+        .course-section, .totals-section, .manage-courses-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .course-section h3, .totals-section h3, .manage-courses-section h3 {
+            font-size: 1em;
+            color: #666;
+            margin: 0 0 10px 0;
+        }
+        .course-select-form select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+        .inline-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .add-course-form {
+            margin-bottom: 15px;
+        }
+        .add-course-form input[type="text"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        .course-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .course-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f9f9f9;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .course-item-name {
+            font-weight: 500;
+        }
+        .active-badge {
+            font-size: 11px;
+            background: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        .course-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .rename-form input[type="text"] {
+            width: 120px;
+            padding: 6px 10px;
+        }
+        .btn-small {
+            padding: 6px 12px;
             font-size: 14px;
         }
         .score-input {

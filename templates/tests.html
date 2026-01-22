@@ -5,6 +5,7 @@
     {% for data in children_data %}
     <div class="child-card">
         <div class="child-name">{{ data.child.name }}</div>
+        <div class="course-name">{{ data.gradebook.name }}</div>
 
         {% if success_gradebook == data.gradebook.id|string %}
         <div class="flash-success">{{ success_pct }}% for {{ success_label }}{% if success_redo %} (redo #{{ success_redo }}){% endif %}</div>

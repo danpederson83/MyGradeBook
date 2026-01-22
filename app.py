@@ -23,6 +23,7 @@ class Gradebook(db.Model):
     child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
     homework_total = db.Column(db.Integer, default=30)
     test_total = db.Column(db.Integer, default=20)
+    is_active = db.Column(db.Boolean, default=False)
     grades = db.relationship('Grade', backref='gradebook', lazy=True, cascade='all, delete-orphan')
 
 
@@ -66,17 +67,29 @@ def get_existing_grades(gradebook_id, label):
     ).order_by(Grade.redo_number.asc()).all()
 
 
+def get_active_gradebook(child_id):
+    """Get the active gradebook for a child, or create default if none exists."""
+    gradebook = Gradebook.query.filter_by(child_id=child_id, is_active=True).first()
+    if not gradebook:
+        # Fall back to first gradebook and make it active
+        gradebook = Gradebook.query.filter_by(child_id=child_id).first()
+        if gradebook:
+            gradebook.is_active = True
+            db.session.commit()
+    return gradebook
+
+
 def build_children_data(grade_type):
     """Build children data for templates."""
     children = Child.query.all()
     children_data = []
     for child in children:
-        math_gradebook = Gradebook.query.filter_by(child_id=child.id, name='Math').first()
-        if math_gradebook:
-            next_num = get_next_number(math_gradebook.id, grade_type)
+        gradebook = get_active_gradebook(child.id)
+        if gradebook:
+            next_num = get_next_number(gradebook.id, grade_type)
             children_data.append({
                 'child': child,
-                'gradebook': math_gradebook,
+                'gradebook': gradebook,
                 'next_num': next_num
             })
     return children_data
@@ -111,9 +124,14 @@ def settings():
     children = Child.query.all()
     children_data = []
     for child in children:
-        gradebook = Gradebook.query.filter_by(child_id=child.id, name='Math').first()
-        if gradebook:
-            children_data.append({'child': child, 'gradebook': gradebook})
+        gradebooks = Gradebook.query.filter_by(child_id=child.id).all()
+        active_gradebook = get_active_gradebook(child.id)
+        if gradebooks:
+            children_data.append({
+                'child': child,
+                'gradebooks': gradebooks,
+                'active_gradebook': active_gradebook
+            })
     return render_template('settings.html', children_data=children_data)
 
 
@@ -229,9 +247,9 @@ def view_grades():
     children = Child.query.all()
     children_data = []
     for child in children:
-        gradebook = Gradebook.query.filter_by(child_id=child.id, name='Math').first()
+        gradebook = get_active_gradebook(child.id)
         if gradebook:
-            # Get all grades grouped by label
+            # Get all grades grouped by label for the active gradebook only
             homework = Grade.query.filter_by(
                 gradebook_id=gradebook.id, grade_type='homework'
             ).order_by(Grade.label, Grade.redo_number).all()
@@ -242,6 +260,7 @@ def view_grades():
 
             children_data.append({
                 'child': child,
+                'gradebook': gradebook,
                 'homework': homework,
                 'tests': tests
             })
@@ -262,8 +281,8 @@ def add_child():
         db.session.add(child)
         db.session.commit()
 
-        # Create default Math gradebook
-        gradebook = Gradebook(name='Math', child_id=child.id)
+        # Create default Math gradebook and set as active
+        gradebook = Gradebook(name='Math', child_id=child.id, is_active=True)
         db.session.add(gradebook)
         db.session.commit()
 
@@ -290,6 +309,66 @@ def update_totals(gradebook_id):
         gradebook.test_total = int(test_total)
 
     db.session.commit()
+    return redirect(url_for('settings'))
+
+
+@app.route('/set_active_course/<int:gradebook_id>', methods=['POST'])
+def set_active_course(gradebook_id):
+    gradebook = Gradebook.query.get_or_404(gradebook_id)
+    # Deactivate all other gradebooks for this child
+    Gradebook.query.filter_by(child_id=gradebook.child_id).update({'is_active': False})
+    # Activate the selected one
+    gradebook.is_active = True
+    db.session.commit()
+    return redirect(url_for('settings'))
+
+
+@app.route('/add_course/<int:child_id>', methods=['POST'])
+def add_course(child_id):
+    child = Child.query.get_or_404(child_id)
+    name = request.form.get('course_name', '').strip()
+    if name:
+        # Check if course already exists for this child
+        existing = Gradebook.query.filter_by(child_id=child_id, name=name).first()
+        if not existing:
+            gradebook = Gradebook(name=name, child_id=child_id, is_active=False)
+            db.session.add(gradebook)
+            db.session.commit()
+    return redirect(url_for('settings'))
+
+
+@app.route('/rename_course/<int:gradebook_id>', methods=['POST'])
+def rename_course(gradebook_id):
+    gradebook = Gradebook.query.get_or_404(gradebook_id)
+    new_name = request.form.get('new_name', '').strip()
+    if new_name:
+        # Check if name already exists for this child
+        existing = Gradebook.query.filter_by(child_id=gradebook.child_id, name=new_name).first()
+        if not existing or existing.id == gradebook_id:
+            gradebook.name = new_name
+            db.session.commit()
+    return redirect(url_for('settings'))
+
+
+@app.route('/delete_course/<int:gradebook_id>', methods=['POST'])
+def delete_course(gradebook_id):
+    gradebook = Gradebook.query.get_or_404(gradebook_id)
+    child_id = gradebook.child_id
+    was_active = gradebook.is_active
+
+    # Don't allow deleting the last course
+    course_count = Gradebook.query.filter_by(child_id=child_id).count()
+    if course_count > 1:
+        db.session.delete(gradebook)
+        db.session.commit()
+
+        # If we deleted the active course, activate another one
+        if was_active:
+            next_gradebook = Gradebook.query.filter_by(child_id=child_id).first()
+            if next_gradebook:
+                next_gradebook.is_active = True
+                db.session.commit()
+
     return redirect(url_for('settings'))
 
 

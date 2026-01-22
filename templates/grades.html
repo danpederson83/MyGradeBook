@@ -5,6 +5,7 @@
     {% for data in children_data %}
     <div class="child-card">
         <div class="child-name">{{ data.child.name }}</div>
+        <div class="course-name">{{ data.gradebook.name }}</div>
 
         {% if data.homework %}
         <div class="grade-section">
