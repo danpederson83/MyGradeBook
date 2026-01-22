@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if children_data %}
+    {% for data in children_data %}
+    <div class="child-card">
+        <div class="child-name">{{ data.child.name }}</div>
+
+        {% if data.homework %}
+        <div class="grade-section">
+            <h3>Homework</h3>
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Score</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grade in data.homework %}
+                    <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
+                        <td>{{ grade.label }}{% if grade.redo_number > 0 %} <span class="redo-badge">redo #{{ grade.redo_number }}</span>{% endif %}</td>
+                        <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
+                        <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if data.tests %}
+        <div class="grade-section">
+            <h3>Tests</h3>
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Score</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grade in data.tests %}
+                    <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
+                        <td>{{ grade.label }}{% if grade.redo_number > 0 %} <span class="redo-badge">redo #{{ grade.redo_number }}</span>{% endif %}</td>
+                        <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
+                        <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if not data.homework and not data.tests %}
+        <p class="no-grades">No grades entered yet.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>No children added yet.</p>
+        <a href="{{ url_for('manage_children') }}" class="btn btn-primary">Add a Child</a>
+    </div>
+{% endif %}
+{% endblock %}

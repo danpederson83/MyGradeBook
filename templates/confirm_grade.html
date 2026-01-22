@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="child-card">
+    <div class="child-name">{{ child.name }} - {{ label }}</div>
+
+    <div class="confirm-message">
+        <p><strong>{{ label }}</strong> already has a score of <strong>{{ current_pct }}%</strong>{% if redo_count > 1 %} ({{ redo_count - 1 }} redo{{ 's' if redo_count > 2 else '' }} recorded){% endif %}.</p>
+        <p>New score: <strong>{{ new_pct }}%</strong></p>
+    </div>
+
+    <div class="confirm-actions">
+        <form action="{{ url_for('confirm_grade') }}" method="post">
+            <input type="hidden" name="gradebook_id" value="{{ gradebook_id }}">
+            <input type="hidden" name="grade_type" value="{{ grade_type }}">
+            <input type="hidden" name="label" value="{{ label }}">
+            <input type="hidden" name="score" value="{{ score }}">
+            <input type="hidden" name="total" value="{{ total }}">
+
+            <button type="submit" name="action" value="redo" class="btn btn-primary">Mark as Redo</button>
+            <button type="submit" name="action" value="overwrite" class="btn btn-secondary">Overwrite</button>
+            <button type="submit" name="action" value="cancel" class="btn btn-cancel">Cancel</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

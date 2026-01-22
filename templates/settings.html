@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<h2>Default Scores</h2>
+
+{% if children_data %}
+    {% for data in children_data %}
+    <div class="child-card">
+        <div class="child-name">{{ data.child.name }} - Math</div>
+
+        <form action="{{ url_for('update_totals', gradebook_id=data.gradebook.id) }}" method="post">
+            <div class="entry-row">
+                <label>Homework total:</label>
+                <input type="number" name="homework_total" value="{{ data.gradebook.homework_total }}" min="1">
+            </div>
+            <div class="entry-row" style="margin-top: 10px;">
+                <label>Test total:</label>
+                <input type="number" name="test_total" value="{{ data.gradebook.test_total }}" min="1">
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Save</button>
+        </form>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>No children added yet.</p>
+        <a href="{{ url_for('manage_children') }}" class="btn btn-primary">Add a Child</a>
+    </div>
+{% endif %}
+
+<h2>Import / Export</h2>
+
+<div class="child-card">
+    <div class="import-export-section">
+        <div class="export-section">
+            <h3>Export Grades</h3>
+            <p>Download all grades as a CSV file.</p>
+            <a href="{{ url_for('export_csv') }}" class="btn btn-primary">Export CSV</a>
+        </div>
+
+        <div class="import-section">
+            <h3>Import Grades</h3>
+            <p>Upload a CSV file to import grades. New children will be created if needed.</p>
+            <form action="{{ url_for('import_csv') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".csv" required>
+                <button type="submit" class="btn btn-primary">Import CSV</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if children_data %}
+    {% for data in children_data %}
+    <div class="child-card">
+        <div class="child-name">{{ data.child.name }}</div>
+
+        {% if success_gradebook == data.gradebook.id|string %}
+        <div class="flash-success">{{ success_pct }}% for {{ success_label }}{% if success_redo %} (redo #{{ success_redo }}){% endif %}</div>
+        {% endif %}
+
+        <form action="{{ url_for('add_grade') }}" method="post" class="grade-entry">
+            <input type="hidden" name="gradebook_id" value="{{ data.gradebook.id }}">
+            <input type="hidden" name="grade_type" value="homework">
+            <input type="hidden" name="total" value="{{ data.gradebook.homework_total }}">
+            <input type="hidden" name="label_prefix" value="Lesson">
+            <div class="entry-row">
+                <div class="label-input">
+                    <span class="label-prefix">Lesson</span>
+                    <input type="number" name="label_num" value="{{ data.next_num }}" min="1" required>
+                </div>
+                <div class="score-input">
+                    <input type="number" name="score" step="0.5" min="0" max="{{ data.gradebook.homework_total }}" placeholder="Score" required>
+                    <span class="divider">/</span>
+                    <span class="total-display">{{ data.gradebook.homework_total }}</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>No children added yet.</p>
+        <a href="{{ url_for('manage_children') }}" class="btn btn-primary">Add a Child</a>
+    </div>
+{% endif %}
+{% endblock %}

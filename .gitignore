@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+.env
+
+# Database
+instance/
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
