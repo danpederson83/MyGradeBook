@@ -103,6 +103,13 @@ def build_children_data(grade_type):
                 'gradebook': gradebook,
                 'next_num': next_num
             })
+        else:
+            # Child has no courses
+            children_data.append({
+                'child': child,
+                'gradebook': None,
+                'next_num': 1
+            })
     return children_data
 
 
@@ -137,12 +144,11 @@ def settings():
     for child in children:
         gradebooks = Gradebook.query.filter_by(child_id=child.id).all()
         active_gradebook = get_active_gradebook(child.id)
-        if gradebooks:
-            children_data.append({
-                'child': child,
-                'gradebooks': gradebooks,
-                'active_gradebook': active_gradebook
-            })
+        children_data.append({
+            'child': child,
+            'gradebooks': gradebooks,
+            'active_gradebook': active_gradebook
+        })
     return render_template('settings.html', children_data=children_data)
 
 
@@ -378,7 +384,9 @@ def add_course(child_id):
         # Check if course already exists for this child
         existing = Gradebook.query.filter_by(child_id=child_id, name=name).first()
         if not existing:
-            gradebook = Gradebook(name=name, child_id=child_id, is_active=False)
+            # Set as active if this is the first course for the child
+            has_courses = Gradebook.query.filter_by(child_id=child_id).first() is not None
+            gradebook = Gradebook(name=name, child_id=child_id, is_active=not has_courses)
             db.session.add(gradebook)
             db.session.commit()
     return redirect(url_for('settings'))
@@ -403,18 +411,15 @@ def delete_course(gradebook_id):
     child_id = gradebook.child_id
     was_active = gradebook.is_active
 
-    # Don't allow deleting the last course
-    course_count = Gradebook.query.filter_by(child_id=child_id).count()
-    if course_count > 1:
-        db.session.delete(gradebook)
-        db.session.commit()
+    db.session.delete(gradebook)
+    db.session.commit()
 
-        # If we deleted the active course, activate another one
-        if was_active:
-            next_gradebook = Gradebook.query.filter_by(child_id=child_id).first()
-            if next_gradebook:
-                next_gradebook.is_active = True
-                db.session.commit()
+    # If we deleted the active course, activate another one if available
+    if was_active:
+        next_gradebook = Gradebook.query.filter_by(child_id=child_id).first()
+        if next_gradebook:
+            next_gradebook.is_active = True
+            db.session.commit()
 
     return redirect(url_for('settings'))
 

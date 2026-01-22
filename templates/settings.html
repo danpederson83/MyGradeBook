@@ -16,6 +16,7 @@
     <div class="child-card">
         <div class="child-name">{{ data.child.name }}</div>
 
+        {% if data.gradebooks %}
         <div class="course-section">
             <h3>Active Course</h3>
             <form action="{{ url_for('set_active_course', gradebook_id=0) }}" method="post" class="course-select-form">
@@ -27,6 +28,7 @@
             </form>
         </div>
 
+        {% if data.active_gradebook %}
         <div class="totals-section">
             <h3>Default Totals for {{ data.active_gradebook.name }}</h3>
             <form action="{{ url_for('update_totals', gradebook_id=data.active_gradebook.id) }}" method="post">
@@ -41,6 +43,8 @@
                 <button type="submit" class="btn btn-secondary" style="margin-top: 10px;">Save Totals</button>
             </form>
         </div>
+        {% endif %}
+        {% endif %}
 
         <div class="manage-courses-section">
             <h3>Manage Courses</h3>
@@ -52,6 +56,7 @@
                 </form>
             </div>
 
+            {% if data.gradebooks %}
             <ul class="course-list">
                 {% for gb in data.gradebooks %}
                 <li>
@@ -61,15 +66,16 @@
                             <input type="text" name="new_name" placeholder="New name" required>
                             <button type="submit" class="btn btn-small">Rename</button>
                         </form>
-                        {% if data.gradebooks|length > 1 %}
                         <form action="{{ url_for('delete_course', gradebook_id=gb.id) }}" method="post" class="inline-form" onsubmit="return confirm('Delete {{ gb.name }}? All grades for this course will be deleted.');">
                             <button type="submit" class="btn btn-small btn-danger">Delete</button>
                         </form>
-                        {% endif %}
                     </div>
                 </li>
                 {% endfor %}
             </ul>
+            {% else %}
+            <p class="no-course-message">No courses yet. Add one above to start entering grades.</p>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

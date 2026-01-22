@@ -5,6 +5,8 @@
     {% for data in children_data %}
     <div class="child-card">
         <div class="child-name">{{ data.child.name }}</div>
+
+        {% if data.gradebook %}
         <div class="course-name">{{ data.gradebook.name }}</div>
 
         {% if success_gradebook == data.gradebook.id|string %}
@@ -29,6 +31,9 @@
             </div>
             <button type="submit" class="btn btn-primary">Add</button>
         </form>
+        {% else %}
+        <p class="no-course-message">No course set up. <a href="{{ url_for('settings') }}">Add a course in Settings</a> to enter grades.</p>
+        {% endif %}
     </div>
     {% endfor %}
 {% else %}
