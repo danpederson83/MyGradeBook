@@ -90,6 +90,24 @@ def extract_label_number(label):
     return 0
 
 
+def mark_superseded_grades(grades):
+    """Mark grades that have been superseded by a redo."""
+    # Find the max redo_number for each label
+    max_redo = {}
+    for g in grades:
+        if g.label not in max_redo or g.redo_number > max_redo[g.label]:
+            max_redo[g.label] = g.redo_number
+
+    # Create list of dicts with superseded flag
+    result = []
+    for g in grades:
+        result.append({
+            'grade': g,
+            'superseded': g.redo_number < max_redo[g.label]
+        })
+    return result
+
+
 def build_children_data(grade_type):
     """Build children data for templates."""
     children = Child.query.all()
@@ -279,25 +297,27 @@ def view_grades():
     gradebook = get_active_gradebook(selected_child.id)
     if gradebook:
         # Get all grades for the active gradebook only
-        homework = Grade.query.filter_by(
+        homework_raw = Grade.query.filter_by(
             gradebook_id=gradebook.id, grade_type='homework'
         ).all()
         # Sort by numeric part of label, then by redo_number
-        homework.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
+        homework_raw.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
+        homework = mark_superseded_grades(homework_raw)
 
-        tests = Grade.query.filter_by(
+        tests_raw = Grade.query.filter_by(
             gradebook_id=gradebook.id, grade_type='test'
         ).all()
-        tests.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
+        tests_raw.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
+        tests = mark_superseded_grades(tests_raw)
 
-        # Calculate averages (as percentages)
+        # Calculate averages (as percentages) using raw grades
         homework_avg = None
-        if homework:
-            homework_avg = sum((g.score / g.total) * 100 for g in homework) / len(homework)
+        if homework_raw:
+            homework_avg = sum((g.score / g.total) * 100 for g in homework_raw) / len(homework_raw)
 
         test_avg = None
-        if tests:
-            test_avg = sum((g.score / g.total) * 100 for g in tests) / len(tests)
+        if tests_raw:
+            test_avg = sum((g.score / g.total) * 100 for g in tests_raw) / len(tests_raw)
 
         # Total score is average of the two averages (not all grades combined)
         total_avg = None

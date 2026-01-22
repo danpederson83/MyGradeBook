@@ -65,12 +65,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for grade in data.homework %}
-                    <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
-                        <td>{{ grade.label }}</td>
-                        <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
-                        <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
-                        <td>{{ grade.redo_number }}</td>
+                    {% for item in data.homework %}
+                    <tr class="{% if item.superseded %}superseded-row{% endif %}">
+                        <td>{{ item.grade.label }}</td>
+                        <td>{{ item.grade.score|int }}/{{ item.grade.total|int }}</td>
+                        <td>{{ ((item.grade.score / item.grade.total) * 100)|round|int }}%</td>
+                        <td>{{ item.grade.redo_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -91,12 +91,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for grade in data.tests %}
-                    <tr{% if grade.redo_number > 0 %} class="redo-row"{% endif %}>
-                        <td>{{ grade.label }}</td>
-                        <td>{{ grade.score|int }}/{{ grade.total|int }}</td>
-                        <td>{{ ((grade.score / grade.total) * 100)|round|int }}%</td>
-                        <td>{{ grade.redo_number }}</td>
+                    {% for item in data.tests %}
+                    <tr class="{% if item.superseded %}superseded-row{% endif %}">
+                        <td>{{ item.grade.label }}</td>
+                        <td>{{ item.grade.score|int }}/{{ item.grade.total|int }}</td>
+                        <td>{{ ((item.grade.score / item.grade.total) * 100)|round|int }}%</td>
+                        <td>{{ item.grade.redo_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -146,15 +146,15 @@
         new Chart(document.getElementById('homeworkChart'), {
             type: 'line',
             data: {
-                labels: [{% for g in data.homework %}'{{ g.label }}{% if g.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                labels: [{% for item in data.homework %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
                 datasets: [{
-                    data: [{% for g in data.homework %}{{ ((g.score / g.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    data: [{% for item in data.homework %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
                     borderColor: '#0066cc',
                     backgroundColor: 'rgba(0, 102, 204, 0.1)',
                     fill: true,
                     tension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: [{% for g in data.homework %}'{% if g.redo_number > 0 %}#ff9500{% else %}#0066cc{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
+                    pointBackgroundColor: [{% for item in data.homework %}'{% if item.grade.redo_number > 0 %}#ff9500{% else %}#0066cc{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
@@ -165,15 +165,15 @@
         new Chart(document.getElementById('testChart'), {
             type: 'line',
             data: {
-                labels: [{% for g in data.tests %}'{{ g.label }}{% if g.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                labels: [{% for item in data.tests %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
                 datasets: [{
-                    data: [{% for g in data.tests %}{{ ((g.score / g.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    data: [{% for item in data.tests %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
                     fill: true,
                     tension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: [{% for g in data.tests %}'{% if g.redo_number > 0 %}#ff9500{% else %}#28a745{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
+                    pointBackgroundColor: [{% for item in data.tests %}'{% if item.grade.redo_number > 0 %}#ff9500{% else %}#28a745{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
