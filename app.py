@@ -79,6 +79,17 @@ def get_active_gradebook(child_id):
     return gradebook
 
 
+def extract_label_number(label):
+    """Extract the numeric part from a label like 'Lesson 3' for natural sorting."""
+    parts = label.split()
+    if parts:
+        try:
+            return int(parts[-1])
+        except ValueError:
+            pass
+    return 0
+
+
 def build_children_data(grade_type):
     """Build children data for templates."""
     children = Child.query.all()
@@ -261,14 +272,17 @@ def view_grades():
     data = None
     gradebook = get_active_gradebook(selected_child.id)
     if gradebook:
-        # Get all grades grouped by label for the active gradebook only
+        # Get all grades for the active gradebook only
         homework = Grade.query.filter_by(
             gradebook_id=gradebook.id, grade_type='homework'
-        ).order_by(Grade.label, Grade.redo_number).all()
+        ).all()
+        # Sort by numeric part of label, then by redo_number
+        homework.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
 
         tests = Grade.query.filter_by(
             gradebook_id=gradebook.id, grade_type='test'
-        ).order_by(Grade.label, Grade.redo_number).all()
+        ).all()
+        tests.sort(key=lambda g: (extract_label_number(g.label), g.redo_number))
 
         # Calculate averages (as percentages)
         homework_avg = None
