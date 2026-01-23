@@ -281,7 +281,7 @@ def confirm_grade():
 def view_grades():
     children = Child.query.all()
     if not children:
-        return render_template('grades.html', children=[], selected_child=None, data=None)
+        return render_template('grades.html', children=[], selected_child=None, data=None, gradebooks=[])
 
     # Get selected child from query param, default to first child
     selected_child_id = request.args.get('child_id', type=int)
@@ -293,8 +293,20 @@ def view_grades():
     if not selected_child:
         selected_child = children[0]
 
+    # Get all gradebooks for this child
+    gradebooks = Gradebook.query.filter_by(child_id=selected_child.id).all()
+
+    # Get selected gradebook from query param, default to active gradebook
+    selected_gradebook_id = request.args.get('gradebook_id', type=int)
+    if selected_gradebook_id:
+        gradebook = Gradebook.query.get(selected_gradebook_id)
+        # Ensure it belongs to the selected child
+        if not gradebook or gradebook.child_id != selected_child.id:
+            gradebook = get_active_gradebook(selected_child.id)
+    else:
+        gradebook = get_active_gradebook(selected_child.id)
+
     data = None
-    gradebook = get_active_gradebook(selected_child.id)
     if gradebook:
         # Get all grades for the active gradebook only
         homework_raw = Grade.query.filter_by(
@@ -337,7 +349,7 @@ def view_grades():
             'total_avg': total_avg
         }
 
-    return render_template('grades.html', children=children, selected_child=selected_child, data=data)
+    return render_template('grades.html', children=children, selected_child=selected_child, data=data, gradebooks=gradebooks)
 
 
 @app.route('/children')

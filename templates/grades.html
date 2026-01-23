@@ -3,13 +3,21 @@
 {% block content %}
 {% if children %}
     <div class="child-card">
-        <select class="child-select" onchange="window.location.href='{{ url_for('view_grades') }}?child_id=' + this.value;">
-            {% for child in children %}
-            <option value="{{ child.id }}" {% if child.id == selected_child.id %}selected{% endif %}>{{ child.name }}</option>
-            {% endfor %}
-        </select>
+        <div class="dropdown-row">
+            <select class="child-select" onchange="window.location.href='{{ url_for('view_grades') }}?child_id=' + this.value;">
+                {% for child in children %}
+                <option value="{{ child.id }}" {% if child.id == selected_child.id %}selected{% endif %}>{{ child.name }}</option>
+                {% endfor %}
+            </select>
+            {% if gradebooks %}
+            <select class="course-select" onchange="window.location.href='{{ url_for('view_grades') }}?child_id={{ selected_child.id }}&gradebook_id=' + this.value;">
+                {% for gb in gradebooks %}
+                <option value="{{ gb.id }}" {% if data and gb.id == data.gradebook.id %}selected{% endif %}>{{ gb.name }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
         {% if data %}
-        <div class="course-name">{{ data.gradebook.name }}</div>
 
         {% if data.homework or data.tests %}
         <div class="stats-section">
