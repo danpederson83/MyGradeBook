@@ -69,7 +69,7 @@
                     {% for item in data.homework %}
                     <tr class="{% if item.superseded %}superseded-row{% endif %}">
                         <td>{{ item.grade.label }}</td>
-                        <td>{{ item.grade.score|int }}/{{ item.grade.total|int }}</td>
+                        <td>{{ item.grade.score|round(1) }}/{{ item.grade.total|int }}</td>
                         <td>{{ ((item.grade.score / item.grade.total) * 100)|round|int }}%</td>
                         <td>{{ item.grade.redo_number }}</td>
                         <td>
@@ -101,7 +101,7 @@
                     {% for item in data.tests %}
                     <tr class="{% if item.superseded %}superseded-row{% endif %}">
                         <td>{{ item.grade.label }}</td>
-                        <td>{{ item.grade.score|int }}/{{ item.grade.total|int }}</td>
+                        <td>{{ item.grade.score|round(1) }}/{{ item.grade.total|int }}</td>
                         <td>{{ ((item.grade.score / item.grade.total) * 100)|round|int }}%</td>
                         <td>{{ item.grade.redo_number }}</td>
                         <td>
