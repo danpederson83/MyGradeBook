@@ -166,35 +166,37 @@
         new Chart(document.getElementById('homeworkChart'), {
             type: 'line',
             data: {
-                labels: [{% for item in data.homework %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                labels: [{% for item in data.homework %}{% if not item.superseded %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}', {% endif %}{% endfor %}],
                 datasets: [{
-                    data: [{% for item in data.homework %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    data: [{% for item in data.homework %}{% if not item.superseded %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}, {% endif %}{% endfor %}],
                     borderColor: '#0066cc',
                     backgroundColor: 'rgba(0, 102, 204, 0.1)',
                     fill: true,
                     tension: 0.3,
                     pointRadius: [
                     {% for item in data.homework %}
-                        {% if item.grade.redo_number > 0 %}4
-                        {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}6
-                        {% else %}4
+                        {% if not item.superseded %}
+                        {% if item.grade.redo_number > 0 %}4,
+                        {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}6,
+                        {% else %}4,
                         {% endif %}
-                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
                     {% endfor %}
                     ],
                     pointStyle: [
                     {% for item in data.homework %}
+                        {% if not item.superseded %}
                         {% if item.grade.redo_number > 0 %}
-                        'circle'
+                        'circle',
                         {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}
-                        'rectRot'
+                        'rectRot',
                         {% else %}
-                        'circle'
+                        'circle',
                         {% endif %}
-                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
                     {% endfor %}
                     ],
-                    pointBackgroundColor: [{% for item in data.homework %}'{% if item.grade.redo_number > 0 %}#ff9500{% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}#FFD700{% else %}#0066cc{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
+                    pointBackgroundColor: [{% for item in data.homework %}{% if not item.superseded %}'{% if item.grade.redo_number > 0 %}#ff9500{% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}#FFD700{% else %}#0066cc{% endif %}', {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
@@ -205,35 +207,37 @@
         new Chart(document.getElementById('testChart'), {
             type: 'line',
             data: {
-                labels: [{% for item in data.tests %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                labels: [{% for item in data.tests %}{% if not item.superseded %}'{{ item.grade.label }}{% if item.grade.redo_number > 0 %} (redo){% endif %}', {% endif %}{% endfor %}],
                 datasets: [{
-                    data: [{% for item in data.tests %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    data: [{% for item in data.tests %}{% if not item.superseded %}{{ ((item.grade.score / item.grade.total) * 100)|round(1) }}, {% endif %}{% endfor %}],
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
                     fill: true,
                     tension: 0.3,
                     pointRadius: [
                     {% for item in data.tests %}
-                        {% if item.grade.redo_number > 0 %}4
-                        {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}6
-                        {% else %}4
+                        {% if not item.superseded %}
+                        {% if item.grade.redo_number > 0 %}4,
+                        {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}6,
+                        {% else %}4,
                         {% endif %}
-                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
                     {% endfor %}
                     ],
                     pointStyle: [
                     {% for item in data.tests %}
+                        {% if not item.superseded %}
                         {% if item.grade.redo_number > 0 %}
-                        'circle'
+                        'circle',
                         {% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}
-                        'rectRot'
+                        'rectRot',
                         {% else %}
-                        'circle'
+                        'circle',
                         {% endif %}
-                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
                     {% endfor %}
                     ],
-                    pointBackgroundColor: [{% for item in data.tests %}'{% if item.grade.redo_number > 0 %}#ff9500{% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}#FFD700{% else %}#0066cc{% endif %}'{% if not loop.last %}, {% endif %}{% endfor %}]
+                    pointBackgroundColor: [{% for item in data.tests %}{% if not item.superseded %}'{% if item.grade.redo_number > 0 %}#ff9500{% elif ((item.grade.score / item.grade.total) * 100) >= 90 %}#FFD700{% else %}#28a745{% endif %}', {% endif %}{% endfor %}]
                 }]
             },
             options: chartOptions
